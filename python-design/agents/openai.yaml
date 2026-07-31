@@ -1,0 +1,4 @@
+interface:
+  display_name: "Python Design"
+  short_description: "Design robust Python domain boundaries"
+  default_prompt: "Use $python-design to review this Python design and recommend only abstractions that earn their cost."

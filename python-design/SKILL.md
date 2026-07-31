@@ -1,153 +1,112 @@
 ---
 name: python-design
-description: "Apply domain modeling principles when designing types, DB schemas, and service layers in Python: strong typing, ADTs with pattern matching over inheritance, ABC/Protocol interfaces, minimal nullability, make illegal states non-representable at type and DB level, functional core / imperative shell. Use when designing or reviewing non-trivial Python code — models, schemas, service layers, interfaces, or domain logic. Not for simple scripts or one-off tooling."
+description: "Design or review non-trivial Python domain models, schemas, service layers, and architectural boundaries. Use when choosing domain types, modeling lifecycle states or variants, defining ABC or Protocol ports, handling expected errors, reducing nullability, parsing untrusted input, separating deterministic logic from I/O, or aligning application and database invariants. Apply these patterns contextually; do not use for simple scripts or one-off tooling."
 ---
 
-# Python Design Principles
+# Python Design
 
-## 1. Algebraic data types over inheritance
+Prefer designs that expose domain meaning, constrain invalid states, and keep side effects visible. Apply the following workflow proportionally: a small CRUD service rarely needs every pattern.
 
-Model variants as a sealed ABC + **frozen** dataclasses. Use `match` to dispatch.
+## Design workflow
+
+1. **Identify invariants and lifecycle states.** State what must always be true and which transitions are valid before choosing classes or tables.
+2. **Mark trust boundaries.** Distinguish untrusted HTTP, queue, file, and database data from values already accepted by the domain.
+3. **Choose the smallest useful representation.** Use a primitive when it is unambiguous, `NewType` for static identity, a validated value object for runtime invariants, an enum for a closed set of constants, and a union of dataclasses for variants with different data.
+4. **Introduce interfaces only at real substitution points.** Choose `Protocol` for structural compatibility and `ABC` for an explicit nominal hierarchy with shared behavior or runtime instantiation checks.
+5. **Separate decisions from effects where it improves testing.** Pass time, randomness, and fetched data into deterministic logic; keep transactions, retries, logging, and I/O in an orchestration layer.
+6. **Place invariants at the durable boundary.** Use application validation for useful errors and database constraints for facts that must survive every writer.
+7. **Explain tradeoffs.** Recommend only the patterns whose benefit exceeds their ceremony, migration cost, and runtime overhead.
+
+## Model variants explicitly
+
+Use an explicit union for exhaustiveness. An `ABC` is extensible and does not make a hierarchy sealed.
 
 ```python
-from abc import ABC
 from dataclasses import dataclass
-from typing import assert_never
+from datetime import datetime
+from typing import NewType, TypeAlias, assert_never
 
-class CallEvent(ABC): ...
+CallId = NewType("CallId", str)
 
-@dataclass(frozen=True)          # frozen = immutable, always
-class CallStarted(CallEvent):
+@dataclass(frozen=True)
+class CallStarted:
     call_id: CallId
     started_at: datetime
 
 @dataclass(frozen=True)
-class CallEnded(CallEvent):
+class CallEnded:
     call_id: CallId
     ended_at: datetime
-    duration_s: DurationS        # non-nullable: computed at END, not optional
+    duration_s: int
+
+CallEvent: TypeAlias = CallStarted | CallEnded
 
 def handle(event: CallEvent) -> None:
     match event:
-        case CallStarted(call_id=cid, started_at=t): ...
-        case CallEnded(call_id=cid, ended_at=t, duration_s=d): ...
-        case _ as unreachable: assert_never(unreachable)  # exhaustiveness
+        case CallStarted(call_id=call_id):
+            print("started", call_id)
+        case CallEnded(call_id=call_id, duration_s=duration_s):
+            print("ended", call_id, duration_s)
+        case _ as unreachable:
+            assert_never(unreachable)
 ```
 
-Rules:
-- Prefer `frozen=True` on domain dataclasses — mutable domain objects contradict functional core. Justify any exception explicitly (e.g. incremental construction via a builder).
-- `assert_never` in every `match` on an ADT — mypy errors when a new variant is unhandled.
+Prefer frozen dataclasses for immutable values and events. Keep entities mutable when identity-preserving state transitions or an ORM require it; isolate and test those mutations.
 
-## 2. Make illegal states non-representable
+Read [references/modeling-patterns.md](references/modeling-patterns.md) when choosing among unions, enums, lifecycle-specific types, `NewType`, and validated value objects.
 
-At the **type level**: no `Optional` unless absence is a meaningful domain concept.
-At the **DB level**: `NOT NULL`, `CHECK`, `ENUM`, FK constraints — not runtime guards.
+## Parse untrusted data at boundaries
 
-```python
-# BAD: nullable escape hatch
-@dataclass
-class HistoryRow:
-    consolidated_at: datetime | None  # can be None? why? when? what enforces it?
+Parse boundary data into domain values before decision-heavy logic uses it. Use Pydantic when it fits the existing stack; do not add it solely to wrap trusted database rows or already typed internal values.
 
-# GOOD: always present, injected at creation
-@dataclass(frozen=True)
-class HistoryRow:
-    consolidated_at: datetime          # set at projection time, never absent
-```
+Treat `NewType` as a static-checking tool, not a validator: it returns the original value unchanged at runtime. Use a validated value object or boundary schema when a value must reject malformed input.
 
-```sql
--- BAD
-consolidated_at TIMESTAMP NULL
+Primitive values remain appropriate when the domain does not require stronger identity or invariants. Avoid wrapping every `str` and `int` mechanically.
 
--- GOOD
-consolidated_at TIMESTAMP NOT NULL
-```
+## Minimize accidental nullability
 
-## 3. ABC and Protocol for architectural boundaries
+Before introducing `T | None` or a nullable column, decide in order:
 
-Use **`ABC`** when implementations must explicitly opt in (repository ports, adapters). Use **`Protocol`** when you want structural subtyping — the implementor doesn't need to import or inherit from the interface, which keeps modules decoupled.
+1. If absence is a genuine domain state, model it explicitly with `None` or a named variant.
+2. If absence represents a lifecycle stage, consider separate before/after types.
+3. If absence means “not loaded,” change the query or projection type rather than weakening the domain model.
+4. If callers must distinguish several failure reasons, use a result union instead of overloading `None`.
 
-```python
-from abc import ABC, abstractmethod
-from typing import Protocol
+Keep a field non-nullable only when every valid instance has a value for it. Do not invent placeholder values to avoid `NULL`.
 
-# ABC: explicit contract — implementors inherit and register
-class Repository(ABC):
-    @abstractmethod
-    def save(self, entity: Entity) -> None: ...
+## Choose boundaries deliberately
 
-# Protocol: structural — any class with a matching signature satisfies it
-class Saveable(Protocol):
-    def save(self, entity: Entity) -> None: ...
-```
+- Use a concrete type until multiple implementations, testing seams, or dependency direction justify an interface.
+- Use `Protocol` when consumers need a structural capability without forcing implementors to inherit or import the interface.
+- Use `ABC` when implementations should join an explicit hierarchy, shared implementation matters, or preventing incomplete instances at runtime is useful.
+- Verify Protocol compatibility where the value is assigned or passed. Expect an incomplete ABC subclass to fail when instantiated; do not describe this as enforcement at class definition.
 
-Choose ABC when you control both sides of the boundary and want mypy to enforce the contract at definition time. Choose Protocol when the implementor is in a different package or you want to avoid circular imports.
+## Handle failures at the right abstraction
 
-Rule: if you can't name the architectural layer the interface lives in, you don't need one — use a concrete type.
+Distinguish expected domain outcomes from programming and infrastructure failures:
 
-## 4. Functional core, imperative shell
+- Use `T | None` for a single self-explanatory absence.
+- Use a result union when callers need structured, exhaustive failure information.
+- Raise a documented domain exception such as `ValueError` when invalid construction is exceptional for the API and callers naturally handle exceptions.
+- Let programming errors propagate.
+- Catch infrastructure exceptions where context can be added, a transaction can be rolled back, or retry/translation policy can be applied. Avoid both blanket catching and an artificial “catch exactly once” rule.
 
-```
-core/           <- pure functions, frozen dataclasses, no I/O
-  logic.py      <- process(inputs, now: datetime) -> list[Result]
-service/        <- thin orchestrator, injects side-effectful values
-  service.py    <- results = process(inputs, datetime.now(UTC))
-adapters/       <- imperative shell: DB, time, network, queues
-  repository.py <- repo.save(results)
-```
+Read [references/boundary-and-error-patterns.md](references/boundary-and-error-patterns.md) when designing boundary parsing, interfaces, result types, exception translation, or transaction handling.
 
-Rule: if a function calls `datetime.now()`, reads from DB, or writes to disk, it belongs in the shell. The core must accept these values as parameters.
+## Align application and database invariants
 
-## 5. Minimal nullable fields checklist
+Use `NOT NULL`, `CHECK`, unique constraints, foreign keys, and transactions for durable relational invariants. Choose native enums only after considering the database dialect and migration frequency; a lookup table or checked text column may evolve more easily.
 
-Applies equally to: dataclasses, Pydantic models, DB columns.
+Do not assume application checks prevent races. Use database uniqueness, locking, isolation, or idempotency mechanisms when concurrent writers matter.
 
-Before adding `Optional` or a nullable column, ask:
+## Present a recommendation
 
-```
-[ ] Is absence a real domain state (not "not loaded yet" or "unknown")?
-[ ] If absent only during creation, can I enforce presence at the constructor?
-[ ] Can I split the type into two (before/after) instead of making a field optional?
-[ ] Can the DB constraint enforce this instead of application code?
-```
+When designing or reviewing code, provide:
 
-If all answers are "no", keep it non-nullable.
+1. Relevant invariants and assumptions
+2. The smallest recommended design
+3. Why each introduced abstraction earns its cost
+4. Important alternatives and tradeoffs
+5. Migration and testing implications
 
-## 6. Parse at the edge
-
-**Pydantic** at system boundaries (HTTP, DB row, queue message) — parse raw data into domain types before it enters the core. The core receives already-valid types, never raw `dict` / `str` / `int`.
-
-**`NewType`** over bare primitives — gives distinct type identity, prevents wrong-argument-order bugs:
-
-```python
-from typing import NewType
-UserId = NewType('UserId', str)
-OrderId = NewType('OrderId', str)
-# get_order(UserId(...))  <- mypy error: expected OrderId
-```
-
-**Smart constructors** for invariants Pydantic can't express (e.g. non-empty strings, validated ranges). `NewType` and smart constructors are complementary, not alternatives:
-
-```python
-@dataclass(frozen=True)
-class Email:
-    value: str
-    def __post_init__(self):
-        if '@' not in self.value:
-            raise ValueError(f"Invalid email: {self.value}")
-```
-
-## 7. Error handling
-
-- **Domain functions never raise.** Expected failures are return types.
-- `T | None` — for simple not-found where absence is self-explanatory.
-- `Result[T, E]` — when the caller needs to know *why* it failed, or there are multiple failure modes.
-- **Exceptions only for:** programming errors (bugs) and infrastructure failures (DB down, network).
-- Never model domain variants as exception subclasses — that is inheritance-based polymorphism for errors, the same antipattern as class inheritance in data modeling.
-- Catch infrastructure exceptions **once**, at the outermost shell layer. Convert to an error return type or log and fail.
-
-```
-Pydantic ValidationError  <- caught by router       -> 422
-Infrastructure exception  <- caught by shell/worker  -> 500 / retry
-Domain errors             <- return type (never raise)
-```
+Avoid forcing domain-heavy architecture onto straightforward data plumbing.
