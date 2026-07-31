@@ -1,70 +1,91 @@
 ---
 name: coupling-cohesion
-description: "Evaluate and improve coupling and cohesion when modifying a module. Use when modifying any module, adding a dependency, extracting code, or when user mentions 'coupling', 'cohesion', 'module boundary', 'god class', 'spaghetti', or 'refactor'."
+description: "Evaluate and improve module boundaries through coupling and cohesion. Use when creating, splitting, merging, or reorganizing modules; extracting or moving responsibilities; introducing cross-module dependencies; changing public interfaces; reviewing architecture; or when the user mentions coupling, cohesion, module boundaries, god classes, or spaghetti code. Do not use for routine local edits that leave responsibilities and boundaries unchanged."
 ---
 
-# Coupling & Cohesion
+# Coupling and Cohesion
 
-Before modifying a module, assess its current state. Before finishing, verify you haven't made it worse.
+Keep responsibilities focused and dependencies necessary, explicit, and directed toward stable public contracts. Treat the classifications below as diagnostic vocabulary, not pass/fail rankings.
 
-## Cohesion — how strongly are the elements of this module associated?
+## Evaluate cohesion
 
-Constantine defines cohesion as the strength of association among elements within a module. A practical signal: the module's purpose should be describable in a single noun or verb phrase. If you need "and", cohesion is low.
+Ask whether a module's elements contribute to a clear responsibility and usually change for the same reason. Treat difficulty naming that responsibility without "and" as a smell, not proof of poor cohesion.
 
-**Signs of low cohesion:**
-- The module imports from many unrelated domains
-- Functions inside it don't share data or purpose
-- You can split it into two modules and neither needs the other
+Look for:
 
-**Cohesion levels (worst → best):**
-```
-Coincidental    — elements grouped arbitrarily ("utils.py")
-Logical         — elements perform logically similar functions, selected by a control flag passed by the caller ("handle_io(type)" that branches on type)
-Temporal        — elements run at the same time ("startup routines")
-Procedural      — elements follow a specific execution sequence but don't share data ("open, read, close")
-Communicational — elements operate on the same data
-Sequential      — output of one feeds the next
-Functional      — elements all contribute to a single well-defined task  ← target
-```
+- Unrelated domain imports or reasons to change
+- Functions that share neither data nor purpose
+- Groups that can be understood, tested, and changed independently
 
-**Rule:** aim for functional cohesion. Anything below communicational (coincidental, logical, temporal, procedural) is poor cohesion — flag it and suggest a split or reorganisation.
+Use these patterns to describe what you find:
 
-## Coupling — how much does this module know about others?
-
-Low coupling means a module depends on as little of another module as possible — ideally only its public interface, not its internals or structure.
-
-**Signs of high coupling:**
-- Changing module A requires changing module B
-- A imports deeply into B's internals (`from b.internal.helpers import _fmt`)
-- A passes large objects to B when B only needs one field
-- A and B share a global data area
-
-**Coupling levels (worst → best):**
-```
-Content   — A references B's interior: modifies its data, branches into it, or depends on its internal structure
-Common    — A and B share access to a global data area
-External  — A and B are coupled through an external format, protocol, or third-party contract
-Control   — A passes a flag that tells B what to do
-Stamp     — A passes a composite data structure; B uses only part of it
-Data      — A passes only the data B needs           ← target
+```text
+Coincidental    — elements grouped arbitrarily (for example, a generic "utils" module)
+Logical         — similar operations selected by a caller-provided control value
+Temporal        — operations grouped because they run at the same time
+Procedural      — operations grouped because they execute in sequence
+Communicational — operations centered on the same data
+Sequential      — one operation's output feeds the next
+Functional      — elements contribute to one well-defined responsibility
 ```
 
-**Rule:** prefer data coupling. Pass only what the callee needs. Never reach into another module's internals.
+Prefer functional cohesion when it fits. Accept temporal, procedural, or communicational cohesion when it expresses a real architectural responsibility. Recommend a split only when the resulting modules have clearer responsibilities and are independently useful.
 
-## When modifying a module
+## Evaluate coupling
 
-1. **Assess before touching** — what is the current cohesion level? What is the coupling to its callers and dependencies?
-2. **Does your change lower cohesion?** If you're adding something unrelated to the module's purpose, it belongs elsewhere.
-3. **Does your change increase coupling?** If you're importing a new module or passing a richer object, look for a thinner interface.
-4. **Flag to the user** any change that would worsen either metric, with a concrete alternative.
+Ask how much one module must know about another, whether that knowledge is necessary, and whether the dependency points toward a stable abstraction or volatile implementation detail.
+
+Look for:
+
+- Imports from another module's private implementation
+- Shared mutable or global state
+- Control flags that expose the callee's internal decisions to callers
+- Composite values whose arbitrary internal fields become part of the dependency
+- Changes to an implementation detail that force unrelated consumers to change
+
+Use these patterns to describe what you find:
+
+```text
+Content  — one module depends on or modifies another's internals
+Common   — modules share global data
+External — modules depend on the same external format, protocol, or contract
+Control  — a caller passes instructions that select the callee's internal behavior
+Stamp    — a callee accepts a structure but depends on only an arbitrary subset
+Data     — a callee receives only the data its contract requires
+```
+
+Prefer narrow dependencies on useful, stable public contracts. Use an existing contract when it creates a meaningful boundary; do not invent an interface solely to make coupling appear lower. Pass a cohesive domain object when the callee genuinely operates on that concept; otherwise pass only the required data. Do not replace meaningful domain types with unrelated primitives merely to reduce the apparent amount of coupling.
+
+## Decide whether to split or merge
+
+Treat a module boundary as a design tool, not a goal. Make each boundary earn its coordination cost.
+
+Consider splitting when one module contains responsibilities that change independently and the resulting modules would be meaningful on their own.
+
+Consider merging when modules change for the same reason, cannot provide meaningful behavior independently, and their boundary creates more coordination than isolation. Look for bidirectional dependencies, forwarding-only layers, invariants or transactions that continually span the boundary, and tests that cannot exercise either module meaningfully in isolation. Treat frequent co-change as supporting evidence only: distinct domain concepts can participate in the same features while still deserving separate boundaries.
+
+Keep modules separate when the boundary protects a real domain distinction, stable policy, ownership, security, deployment, or substitution point. Do not merge merely because modules collaborate frequently. Merge only when the combined module retains a clear responsibility and removes more accidental coupling than it introduces.
+
+For example, merge a pricing module with a pricing service that only forwards every operation and has no independent policy or runtime boundary. Split pricing from notification delivery when they change for different reasons and can be understood and tested independently.
+
+## Review the change
+
+1. State the module's primary responsibility and reasons to change.
+2. Identify the relevant callers, dependencies, and public contracts.
+3. Compare the design before and after the proposed change.
+4. Distinguish necessary domain coupling from accidental implementation coupling.
+5. Recommend restructuring only when it materially improves understanding, testability, or changeability without adding unjustified indirection.
+6. Report material deterioration with evidence and a concrete alternative. Do not flag harmless or unavoidable coupling merely because a dependency was added.
 
 ## Quick checks
 
-```
-[ ] Can I name this module's purpose without using "and"?
-[ ] Does my change fit that purpose?
-[ ] Am I importing a new module? Is there a narrower dependency?
-[ ] Am I passing a large object? Can I pass only the needed fields?
-[ ] Am I reading another module's internals? Should I go through its public interface?
-[ ] Would this change force edits in other modules?
+```text
+[ ] Can I state the module's responsibility and reason to change clearly?
+[ ] Does this change introduce a responsibility that can vary independently?
+[ ] Is each dependency necessary, explicit, and directed toward a useful stable contract?
+[ ] Does either module depend on the other's private representation or decisions?
+[ ] Is a passed object a genuine domain concept or merely a convenient bag of data?
+[ ] Are neighboring modules independently meaningful, or is one mostly forwarding?
+[ ] Does their boundary protect a real domain, policy, ownership, or runtime distinction?
+[ ] Would splitting or merging improve changeability without adding unjustified indirection?
 ```

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Coupling and Cohesion"
+  short_description: "Review module coupling and cohesion"
+  default_prompt: "Use $coupling-cohesion to review these module boundaries and recommend only material improvements."
