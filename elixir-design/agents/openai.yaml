@@ -1,0 +1,4 @@
+interface:
+  display_name: "Elixir Design"
+  short_description: "Design robust Elixir domain and process boundaries"
+  default_prompt: "Use $elixir-design to review this Elixir design and recommend only abstractions that earn their cost."

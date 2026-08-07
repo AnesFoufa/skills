@@ -1,0 +1,21 @@
+{
+  "name": "shared-skills",
+  "skills": [
+    "./bitbucket-pr",
+    "./confluence",
+    "./coupling-cohesion",
+    "./deploy-release",
+    "./elixir-design",
+    "./grill-me",
+    "./jira-transition",
+    "./literate-tdd",
+    "./monitor-deployment",
+    "./monitor-jenkins-build",
+    "./python-design",
+    "./review-pr",
+    "./review-ready",
+    "./review",
+    "./ship",
+    "./workflow"
+  ]
+}
