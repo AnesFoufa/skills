@@ -1,4 +1,4 @@
 interface:
   display_name: "Coupling and Cohesion"
-  short_description: "Review module coupling and cohesion"
-  default_prompt: "Use $coupling-cohesion to review these module boundaries and recommend only material improvements."
+  short_description: "Trace change pressure across module seams"
+  default_prompt: "Use $coupling-cohesion to map the change pressure across these module seams and recommend the smallest structural move that earns its cost."

@@ -1,91 +1,98 @@
 ---
 name: coupling-cohesion
-description: "Evaluate and improve module boundaries through coupling and cohesion. Use when creating, splitting, merging, or reorganizing modules; extracting or moving responsibilities; introducing cross-module dependencies; changing public interfaces; reviewing architecture; or when the user mentions coupling, cohesion, module boundaries, god classes, or spaghetti code. Do not use for routine local edits that leave responsibilities and boundaries unchanged."
+description: "Diagnose and redesign module seams by tracing change pressure, responsibility, and leaked knowledge. Use when splitting, merging, extracting, or reorganizing modules; changing public interfaces or cross-module dependencies; reviewing architecture; or investigating god classes and spaghetti code. Skip routine local edits whose responsibilities and seams stay unchanged."
 ---
 
 # Coupling and Cohesion
 
-Keep responsibilities focused and dependencies necessary, explicit, and directed toward stable public contracts. Treat the classifications below as diagnostic vocabulary, not pass/fail rankings.
+Find the **change gravity**: behavior that must move together belongs together; knowledge that crosses a seam must earn the coordination it creates.
 
-## Evaluate cohesion
+Treat a module as any architectural unit with an interface and implementation—a class, file, package, subsystem, or process. Do not optimize for the fewest dependencies or the smallest files. Optimize for a design in which a likely change is local, invariants have one home, and callers know only what their work requires.
 
-Ask whether a module's elements contribute to a clear responsibility and usually change for the same reason. Treat difficulty naming that responsibility without "and" as a smell, not proof of poor cohesion.
+## Choose the depth of review
 
-Look for:
+- **Change guardrail** — while implementing a scoped change, inspect only its boundary delta. Continue silently when responsibility and coupling stay sound; report a concern only when the change materially worsens them.
+- **Focused seam review** — when the user names modules or a design decision, trace that seam and return a boundary brief.
+- **Landscape review** — when the user asks for architectural candidates across a repository or subsystem, locate change-pressure hotspots and compare several seams. Read [references/visual-report.md](references/visual-report.md) and present the findings as its visual report.
 
-- Unrelated domain imports or reasons to change
-- Functions that share neither data nor purpose
-- Groups that can be understood, tested, and changed independently
+Use [references/diagnostic-vocabulary.md](references/diagnostic-vocabulary.md) only when classical coupling or cohesion labels will sharpen the explanation. Evidence and consequences matter more than assigning a category.
 
-Use these patterns to describe what you find:
+## Trace change pressure
 
-```text
-Coincidental    — elements grouped arbitrarily (for example, a generic "utils" module)
-Logical         — similar operations selected by a caller-provided control value
-Temporal        — operations grouped because they run at the same time
-Procedural      — operations grouped because they execute in sequence
-Communicational — operations centered on the same data
-Sequential      — one operation's output feeds the next
-Functional      — elements contribute to one well-defined responsibility
-```
+Start from a concrete behavior or plausible change, not the directory tree.
 
-Prefer functional cohesion when it fits. Accept temporal, procedural, or communicational cohesion when it expresses a real architectural responsibility. Recommend a split only when the resulting modules have clearer responsibilities and are independently useful.
+1. **Name the promise.** Complete: “This module owns ___.” Then list the distinct reasons it changes. An “and” is a lead to investigate, not an automatic split.
+2. **Draw the seam.** Identify callers, public entry points, dependencies, data crossing the seam, shared state, errors, transactions, and tests. Read domain glossaries and relevant ADRs when present.
+3. **Follow one change.** Ask which files, interfaces, and tests move when a representative rule changes. For a broad review, use recent history to find frequently changed areas, then inspect the code; co-change is supporting evidence, never the verdict.
+4. **Mark leaked knowledge.** Record every place one side must know the other side's representation, call order, control flow, partial object shape, failure mechanics, or mutation timing.
+5. **Separate necessary coupling from accidental coupling.** Shared domain meaning, atomic invariants, protocols, ownership, and runtime constraints may require coupling. Convenience imports, forwarding modules, control flags, and duplicated orchestration usually do not.
 
-## Evaluate coupling
+The trace is complete when every material arrow across the seam has a purpose and a change consequence.
 
-Ask how much one module must know about another, whether that knowledge is necessary, and whether the dependency points toward a stable abstraction or volatile implementation detail.
+## Put the seam on trial
 
-Look for:
+Test the current design and its smallest credible alternative. Do not prescribe a split merely because a module is large, or an interface merely because a dependency exists.
 
-- Imports from another module's private implementation
-- Shared mutable or global state
-- Control flags that expose the callee's internal decisions to callers
-- Composite values whose arbitrary internal fields become part of the dependency
-- Changes to an implementation detail that force unrelated consumers to change
+### Split test
 
-Use these patterns to describe what you find:
+A split earns its seam when both sides:
 
-```text
-Content  — one module depends on or modifies another's internals
-Common   — modules share global data
-External — modules depend on the same external format, protocol, or contract
-Control  — a caller passes instructions that select the callee's internal behavior
-Stamp    — a callee accepts a structure but depends on only an arbitrary subset
-Data     — a callee receives only the data its contract requires
-```
+- have names based on responsibilities rather than mechanics;
+- can change, be understood, and be tested meaningfully on their own;
+- communicate through a smaller contract than the implementation they hide; and
+- do not force one invariant, transaction, or workflow to shuttle back and forth.
 
-Prefer narrow dependencies on useful, stable public contracts. Use an existing contract when it creates a meaningful boundary; do not invent an interface solely to make coupling appear lower. Pass a cohesive domain object when the callee genuinely operates on that concept; otherwise pass only the required data. Do not replace meaningful domain types with unrelated primitives merely to reduce the apparent amount of coupling.
+If the proposed halves continually coordinate, the split distributed one responsibility instead of discovering two.
 
-## Decide whether to split or merge
+### Merge test
 
-Treat a module boundary as a design tool, not a goal. Make each boundary earn its coordination cost.
+Imagine deleting the seam. Merge or absorb a module when deletion concentrates the behavior and removes forwarding, call-order, or shared-invariant knowledge. Keep the seam when deletion erases a real domain, policy, ownership, security, deployment, or substitution distinction.
 
-Consider splitting when one module contains responsibilities that change independently and the resulting modules would be meaningful on their own.
+### Contract test
 
-Consider merging when modules change for the same reason, cannot provide meaningful behavior independently, and their boundary creates more coordination than isolation. Look for bidirectional dependencies, forwarding-only layers, invariants or transactions that continually span the boundary, and tests that cannot exercise either module meaningfully in isolation. Treat frequent co-change as supporting evidence only: distinct domain concepts can participate in the same features while still deserving separate boundaries.
+For each value or instruction crossing the seam, ask:
 
-Keep modules separate when the boundary protects a real domain distinction, stable policy, ownership, security, deployment, or substitution point. Do not merge merely because modules collaborate frequently. Merge only when the combined module retains a clear responsibility and removes more accidental coupling than it introduces.
+- Does the receiver need the whole concept, or merely fields from a convenient bag?
+- Does a flag make the caller choose the receiver's internal path?
+- Are callers coupled to construction, sequencing, retries, or exception details?
+- Would narrowing the contract clarify the domain, or merely replace a meaningful type with primitives?
+- Is there a real alternate implementation or dependency-direction need, or would a new interface be speculative ceremony?
 
-For example, merge a pricing module with a pricing service that only forwards every operation and has no independent policy or runtime boundary. Split pricing from notification delivery when they change for different reasons and can be understood and tested independently.
+## Choose the smallest structural move
 
-## Review the change
+Give one primary verdict:
 
-1. State the module's primary responsibility and reasons to change.
-2. Identify the relevant callers, dependencies, and public contracts.
-3. Compare the design before and after the proposed change.
-4. Distinguish necessary domain coupling from accidental implementation coupling.
-5. Recommend restructuring only when it materially improves understanding, testability, or changeability without adding unjustified indirection.
-6. Report material deterioration with evidence and a concrete alternative. Do not flag harmless or unavoidable coupling merely because a dependency was added.
+- **Keep** — the seam protects a meaningful distinction and its coupling is necessary.
+- **Move** — one responsibility is simply on the wrong side.
+- **Narrow** — retain the modules but remove leaked knowledge from the contract.
+- **Invert** — dependency direction conflicts with policy, ownership, or volatility.
+- **Split** — independent responsibilities are trapped together.
+- **Merge** — one responsibility is fragmented across a tax-producing seam.
 
-## Quick checks
+Prefer moving behavior or reshaping an existing contract before inventing a new abstraction. Preserve user-selected frameworks, deployment boundaries, and recorded architecture decisions unless the evidence justifies explicitly reopening them.
 
-```text
-[ ] Can I state the module's responsibility and reason to change clearly?
-[ ] Does this change introduce a responsibility that can vary independently?
-[ ] Is each dependency necessary, explicit, and directed toward a useful stable contract?
-[ ] Does either module depend on the other's private representation or decisions?
-[ ] Is a passed object a genuine domain concept or merely a convenient bag of data?
-[ ] Are neighboring modules independently meaningful, or is one mostly forwarding?
-[ ] Does their boundary protect a real domain, policy, ownership, or runtime distinction?
-[ ] Would splitting or merging improve changeability without adding unjustified indirection?
-```
+## Prove the recommendation
+
+Run a **change simulation** before recommending a structural move:
+
+1. Pick a realistic next change.
+2. List the modules, contracts, and tests it touches now.
+3. List what it would touch after the proposed move.
+4. Check where the invariant, transaction, and error policy live afterward.
+5. Reject the proposal if it only relocates complexity, hides necessary coupling, or adds coordination without reducing leaked knowledge.
+
+When implementation is requested, preserve behavior with tests through public interfaces and make only the chosen structural move. Verify that dependency direction and affected tests match the proposed after-state.
+
+## Deliver the verdict
+
+For a focused review, return a compact **boundary brief**:
+
+1. **Verdict** — one of Keep, Move, Narrow, Invert, Split, or Merge, with confidence.
+2. **Module promises** — one responsibility sentence per module.
+3. **Pressure map** — a small before/after diagram when relationships are otherwise hard to see.
+4. **Coupling ledger** — for each material dependency: knowledge crossing the seam, why it exists, and the change it propagates.
+5. **Recommendation** — the smallest concrete move, naming affected modules and contracts.
+6. **Change simulation** — before versus after touch points and test surface.
+7. **Tradeoff** — what becomes worse or remains necessarily coupled.
+
+Use strength labels rather than fake scores: **Strong**, **Worth exploring**, or **Speculative**. Distinguish observed facts from inferences. If the evidence supports keeping the current seam, say so plainly; “no refactor” is a successful review.
