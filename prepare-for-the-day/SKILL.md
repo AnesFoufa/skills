@@ -1,124 +1,147 @@
 ---
 name: prepare-for-the-day
-description: Guide a short interactive Stoic preparation for the day or an upcoming encounter. Help the user choose one situation, anticipate a difficulty, and formulate one realistic intention.
+description: Guide a short interactive Stoic preparation for the day or an upcoming encounter, including a "méditation stoïcienne du matin." Help the user choose one situation, anticipate a difficulty, form one realistic intention, and save the preparation as Markdown.
 ---
 
-# Prepare for the Day
+# Préparation stoïcienne du jour
 
-Guide a 3–5 minute reflection. Help the user prepare to act
-with judgment, consideration, and flexibility.
+Conduis une réflexion de 3 à 5 minutes. Aide l'utilisateur à se
+préparer à agir avec discernement, considération et souplesse dans une
+situation concrète.
 
-Ask one question at a time and wait for the answer.
-Use the user's language. Skip questions already answered.
-Keep each turn to 1–3 sentences.
+Pose une seule question à la fois et attends la réponse. Utilise la
+langue et les mots de l'utilisateur. Saute les questions auxquelles il
+a déjà répondu. Garde chaque intervention entre une et trois phrases.
 
-## 1. Choose one situation
+## 1. Choisir une situation
 
-Ask:
-“What is one situation today in which you want to act
-with more care or judgment?”
+Demande :
+« Dans quelle situation aujourd'hui souhaites-tu agir avec davantage
+de soin ou de discernement ? »
 
-Help the user select one concrete situation.
-Allow ordinary activities, pleasant encounters, and rest.
-Do not assume the day will be difficult.
+Aide l'utilisateur à choisir une seule situation concrète. Accepte les
+activités ordinaires, les rencontres agréables et le repos. Ne suppose
+pas que la journée sera difficile.
 
-## 2. Anticipate one difficulty
+## 2. Anticiper une difficulté
 
-Ask:
-“What might make that difficult for you?”
+Demande :
+« Qu'est-ce qui pourrait rendre cela difficile pour toi ? »
 
-Stay with one plausible obstacle.
-Distinguish what might happen from what the user might
-conclude about it. Do not speculate about other people's
-motives or generate catastrophic scenarios.
+Reste sur un obstacle plausible. Distingue ce qui pourrait arriver de
+ce que l'utilisateur pourrait en conclure. Ne spécule pas sur les
+intentions des autres et ne construis pas de scénario catastrophique.
 
-If anticipation increases rumination, move directly
-to an available action.
+Si l'anticipation nourrit la rumination, passe directement à une
+action disponible.
 
-## 3. Locate the choice
+## 3. Situer la part d'action
 
-Ask:
-“If that happens, what part of your response can you work on?”
+Demande :
+« Si cela arrive, quelle partie de ta réponse peux-tu travailler ? »
 
-Distinguish intentions and attempted actions from outcomes.
-Recognize influence without promising control.
+Distingue les intentions et les actions tentées des résultats.
+Reconnais l'influence possible sans promettre le contrôle.
 
-Do not imply that emotions, bodily reactions, or intrusive
-thoughts are entirely voluntary.
+Ne présente pas les émotions, les réactions corporelles ou les
+pensées intrusives comme entièrement volontaires. Transforme un
+objectif portant sur le résultat en action disponible :
 
-Translate outcome goals into available actions:
-“Make them agree” → “Explain my reasoning and hear their objection.”
+« Les convaincre » devient « Expliquer mon raisonnement et écouter
+leur objection. »
 
-## 4. Choose how to act
+## 4. Choisir une manière d'agir
 
-Ask:
-“What would acting well look like here, for you and
-the people affected?”
+Demande :
+« À quoi ressemblerait une bonne manière d'agir ici, pour toi et pour
+les personnes concernées ? »
 
-When useful, introduce one relevant quality:
-wisdom, justice, courage, or temperance.
-Translate it into behavior.
+Lorsque cela aide, introduis une seule qualité pertinente : sagesse,
+justice, courage ou tempérance. Traduis-la en comportement observable.
 
-Consider responsibilities, relationships, and personal limits.
-Allow boundaries, rest, assistance, and changing course.
-Do not equate acting well with pleasing others, suppressing
-emotion, or maximizing productivity.
+Tiens compte des responsabilités, des relations et des limites
+personnelles. Autorise les limites, le repos, la demande d'aide et le
+changement de cap. Ne confonds pas bien agir avec satisfaire les
+autres, réprimer une émotion ou maximiser la productivité.
 
-## 5. Rehearse one response
+## 5. Répéter mentalement une réponse
 
-Ask:
-“When you notice that difficulty, what is one small thing
-you intend to do?”
+Demande :
+« Quand tu remarqueras cette difficulté, quelle petite action as-tu
+l'intention de faire ? »
 
-Help formulate an intention in the user's words:
+Aide à formuler l'intention avec les mots de l'utilisateur :
 
-“If [recognizable cue], I intend to [feasible response],
-even if [uncertain outcome].”
+« Si [signal reconnaissable], j'ai l'intention de [réponse réalisable],
+même si [résultat incertain]. »
 
-Prefer an observable action to “be calm” or “be virtuous.”
-Leave room for recovery after an unhelpful first reaction.
+Préfère une action observable à « rester calme » ou « être vertueux ».
+Laisse la possibilité de se reprendre après une première réaction
+maladroite.
 
-## Close and write the file
+## Écrire le fichier Markdown
 
-After the reflection, create a Markdown file containing only
-information the user supplied or accepted. Use the path the user
-specifies; otherwise write `day-preparation.md` in the current
-workspace. If that file already exists, choose a dated filename such
-as `day-preparation-YYYY-MM-DD.md` rather than overwriting it.
+Après la réflexion, crée un fichier Markdown contenant uniquement les
+éléments fournis ou acceptés par l'utilisateur.
 
-Use this compact structure:
+Utilise le chemin indiqué par l'utilisateur. À défaut :
+
+- si le workspace contient un dossier `Méditations/`, écris dans
+  `Méditations/YYYY-MM-DD - Préparation du jour.md` ;
+- sinon, écris `day-preparation-YYYY-MM-DD.md` dans le workspace
+  courant.
+
+N'écrase pas un fichier existant. Ajoute un suffixe numérique au nom
+si nécessaire.
+
+Utilise cette structure en omettant les sections qui n'ont pas été
+établies :
 
 ```markdown
-# Day Preparation
+---
+tags:
+  - stoïcisme
+  - meditation
+  - preparation
+---
+
+# Préparation stoïcienne — YYYY-MM-DD
 
 ## Situation
-[Chosen situation]
+[Situation choisie]
+
+## Difficulté anticipée
+[Obstacle plausible]
+
+## Ma part d'action
+[Ce que l'utilisateur peut travailler]
+
+## Manière d'agir
+[Qualité pertinente traduite en comportement observable]
 
 ## Intention
-If [recognizable cue], I intend to [feasible response].
-
-## Room for uncertainty
-[Outcome they cannot guarantee]
+Si [signal reconnaissable], j'ai l'intention de [réponse réalisable],
+même si [résultat incertain].
 ```
 
-Omit any section the user did not establish; do not invent details to
-fill gaps. After writing the file, give its path and a brief summary.
-Do not append another exercise, question, score, or assignment.
+Après avoir écrit le fichier, donne son chemin et résume brièvement
+ce qu'il contient. N'ajoute pas un autre exercice, une note, un score
+ou une nouvelle question.
 
-## Philosophical grounding
+## Ancrage philosophique
 
-Present this as a modern conversational adaptation of:
+Présente l'exercice comme une adaptation conversationnelle moderne de
+l'exercice proposé par Épictète dans le `Manuel`, 4, et de la
+préparation matinale de Marc Aurèle dans les `Pensées`, II, 1.
 
-- Epictetus, Enchiridion 4.
-- Marcus Aurelius, Meditations 2.1.
+N'invente pas de citation et n'attribue pas les ajouts modernes aux
+auteurs anciens. N'exige aucune adhésion métaphysique.
 
-Do not invent quotations or attribute modern additions
-to ancient authors. Do not require metaphysical assent.
+## Limites
 
-## Boundaries
+Respecte toute demande de passer une question ou d'arrêter. N'utilise
+jamais l'acceptation pour conseiller d'endurer un tort ou un danger.
 
-Respect requests to skip or stop.
-Never use acceptance to recommend enduring harm.
-Do not schedule reminders without authorization. Writing the
-reflection file above is part of this skill's requested output; do not
-save additional personal reflections elsewhere.
+L'écriture du fichier de préparation fait partie de la sortie demandée.
+N'enregistre pas d'autres réflexions personnelles et ne programme pas
+de rappel sans autorisation.
