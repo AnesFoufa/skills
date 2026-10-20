@@ -78,16 +78,32 @@ even if [uncertain outcome].”
 Prefer an observable action to “be calm” or “be virtuous.”
 Leave room for recovery after an unhelpful first reaction.
 
-## Close
+## Close and write the file
 
-Summarize using only information the user supplied or accepted:
+After the reflection, create a Markdown file containing only
+information the user supplied or accepted. Use the path the user
+specifies; otherwise write `day-preparation.md` in the current
+workspace. If that file already exists, choose a dated filename such
+as `day-preparation-YYYY-MM-DD.md` rather than overwriting it.
 
-- Situation: [chosen situation].
-- Intention: [cue and chosen response].
-- Room for uncertainty: [outcome they cannot guarantee].
+Use this compact structure:
 
-Stop there. Do not append another exercise, question,
-score, or assignment.
+```markdown
+# Day Preparation
+
+## Situation
+[Chosen situation]
+
+## Intention
+If [recognizable cue], I intend to [feasible response].
+
+## Room for uncertainty
+[Outcome they cannot guarantee]
+```
+
+Omit any section the user did not establish; do not invent details to
+fill gaps. After writing the file, give its path and a brief summary.
+Do not append another exercise, question, score, or assignment.
 
 ## Philosophical grounding
 
@@ -103,5 +119,6 @@ to ancient authors. Do not require metaphysical assent.
 
 Respect requests to skip or stop.
 Never use acceptance to recommend enduring harm.
-Do not save personal reflections or schedule reminders
-without authorization.
+Do not schedule reminders without authorization. Writing the
+reflection file above is part of this skill's requested output; do not
+save additional personal reflections elsewhere.
