@@ -56,6 +56,12 @@ Aide-le à distinguer ce qu'il sait, ce qu'il redoute et ce qu'il doit
 encore apprendre. Saute cette question si l'incertitude est déjà claire
 ou si l'utilisateur souhaite passer à l'action.
 
+Si une interprétation de la difficulté apparaît, demande ensuite :
+« Quel jugement risquerais-tu de porter sur ce qui arrive ? »
+
+Distingue ce jugement du fait anticipé et de l'émotion qui pourrait
+survenir. Ne présume pas qu'une crainte soit une erreur à corriger.
+
 Si l'anticipation nourrit la rumination, passe directement à une
 action disponible.
 
@@ -85,11 +91,15 @@ les personnes concernées ? »
 
 Lorsque cela aide, introduis une seule qualité pertinente : sagesse,
 justice, courage ou tempérance. Traduis-la en comportement observable.
+Cherche une conduite qui resterait appropriée même si la réponse ou le
+résultat espéré n'arrive pas.
 
 Tiens compte des responsabilités, des relations et des limites
 personnelles. Autorise les limites, le repos, la demande d'aide et le
 changement de cap. Ne confonds pas bien agir avec satisfaire les
 autres, réprimer une émotion ou maximiser la productivité.
+Si d'autres personnes sont concernées, aide l'utilisateur à préciser
+comment sa réponse peut aussi les respecter.
 
 ## 5. Répéter mentalement une réponse
 
@@ -155,6 +165,9 @@ tags:
 
 ## Ce qui reste incertain
 [Ce qui est encore inconnu, distingué de ce qui est connu ou redouté]
+
+## Jugement à examiner
+[Interprétation anticipée, si l'utilisateur en a identifié une]
 
 ## Ma part d'action
 [Ce que l'utilisateur peut travailler]

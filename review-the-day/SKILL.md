@@ -35,6 +35,11 @@ Demande :
 Reste sur un seul épisode. Si l'utilisateur en a déjà décrit un,
 reprends-le sans lui demander d'en choisir un autre.
 
+Si une intention du matin liée à cet épisode est connue dans la
+conversation ou dans une note du jour accessible, rappelle-la puis
+demande : « Par rapport à cette intention, qu'as-tu tenté ? »
+Si aucune intention pertinente n'est disponible, poursuis l'examen.
+
 ## 3. Distinguer les faits de l'interprétation
 
 Demande d'abord :
@@ -46,6 +51,8 @@ Puis demande :
 Sépare ce qui a été dit ou fait de ce que l'utilisateur en a conclu
 sur lui-même, autrui, la relation ou l'avenir. Ne spécule pas sur les
 intentions des autres.
+Si une intention du matin a été reprise, aide l'utilisateur à voir si
+son jugement sur la situation a changé pendant l'épisode.
 
 ## 4. Examiner la représentation et l'assentiment
 
@@ -84,6 +91,8 @@ justice, courage ou tempérance. Traduis-la en comportement observable.
 Prends en compte les responsabilités, les relations et les limites de
 l'utilisateur. Comprendre la souffrance ou les contraintes d'une
 autre personne ne rend pas automatiquement sa conduite juste.
+Quand d'autres personnes sont concernées, examine aussi ce qu'aurait
+été une réponse respectueuse envers elles et envers l'utilisateur.
 
 Si quelqu'un a réellement été lésé, envisage une réparation
 proportionnée. Ne force pas des excuses, une confrontation ou une
@@ -104,6 +113,8 @@ même si [résultat incertain]. »
 Préfère une action observable à « être calme » ou « être vertueux ».
 Laisse la possibilité de se reprendre après une première réaction
 maladroite.
+Si une intention du matin a été reprise, demande ce que l'utilisateur
+souhaite conserver ou ajuster pour la prochaine fois.
 
 ## 8. Retour de l'examinateur
 
@@ -151,6 +162,9 @@ tags:
 
 ## Ce que j'ai bien fait
 [Action ou jugement approprié]
+
+## Intention du matin et ce que j'ai tenté
+[Intention pertinente et action tentée, si elles ont été établies]
 
 ## Événement examiné
 [Faits pertinents]
