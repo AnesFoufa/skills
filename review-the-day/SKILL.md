@@ -5,9 +5,11 @@ description: Guide a short interactive Stoic review of the day, including an "ex
 
 # Examen de conscience stoïcien
 
-Conduis une relecture de 5 à 8 minutes orientée vers le discernement,
-l'apprentissage et l'action. Il ne s'agit ni d'une confession ni d'un
-jugement sur la valeur de la personne.
+Conduis une relecture d'environ 5 à 8 minutes orientée vers le
+discernement, l'apprentissage et l'action. Si l'utilisateur souhaite
+approfondir, poursuis jusqu'à environ 15 minutes en suivant son rythme
+plutôt qu'un nombre fixe de questions. Il ne s'agit ni d'une confession
+ni d'un jugement sur la valeur de la personne.
 
 Pose une seule question à la fois et attends la réponse. Utilise la
 langue et les mots de l'utilisateur. Saute les questions auxquelles il
@@ -16,6 +18,23 @@ a déjà répondu. Garde chaque intervention entre une et trois phrases.
 Si l'utilisateur manifeste de la fatigue, de la réticence ou un risque
 de rumination, utilise une version courte : une chose bien faite, un
 seul moment à examiner et une seule intention pour la suite.
+
+## Ouverture
+
+Avant la première question, donne deux courts passages de Sénèque sur
+la relecture de la journée. Cite l'œuvre, la section et la traduction
+avec un lien vers le texte. En français, tu peux utiliser ces extraits
+vérifiés :
+
+- « Quel sommeil que celui qui succède à cet examen de conscience ! » —
+  Sénèque, [*De la colère*, III, 36, traduction de Joseph Baillard](https://fr.wikisource.org/wiki/De_la_Col%C3%A8re_%28trad._Baillard%29).
+- « Je vais m’observer dès à présent, et, suivant la plus utile des
+  pratiques, faire la revue de ma journée. » — Sénèque,
+  [*Lettre à Lucilius* 83, 2, traduction de Joseph Baillard](https://fr.wikisource.org/wiki/Lettres_%C3%A0_Lucilius/Lettre_83).
+
+Présente ces passages comme une invitation à apprendre de la journée,
+sans supposer que l'utilisateur a commis une faute. Passe ensuite à la
+première question.
 
 ## 1. Reconnaître ce qui a été bien fait
 
@@ -29,11 +48,17 @@ d'avoir satisfait les autres.
 
 ## 2. Choisir un moment
 
-Demande :
+Si l'utilisateur a déjà décrit un épisode, reprends-le sans lui demander
+de parcourir la journée ou d'en choisir un autre. Sinon, invite-le à
+parcourir brièvement sa journée :
+« En repensant à ta journée, quels moments te reviennent ? »
+Attends sa réponse, puis demande :
+
 « Quel moment de ta journée mérite le plus d'être examiné ? »
 
-Reste sur un seul épisode. Si l'utilisateur en a déjà décrit un,
-reprends-le sans lui demander d'en choisir un autre.
+Examine un épisode à la fois. Si l'utilisateur souhaite ensuite
+approfondir un autre moment, accueille-le sans en faire une étape
+obligatoire.
 
 Si une intention du matin liée à cet épisode est connue dans la
 conversation ou dans une note du jour accessible, rappelle-la puis
@@ -118,12 +143,15 @@ souhaite conserver ou ajuster pour la prochaine fois.
 
 ## 8. Retour de l'examinateur
 
-Une fois l'intention formulée, adresse à l'utilisateur un bref retour
-à la manière d'une lettre morale de Sénèque à Lucilius, en parlant en
-ton nom. En deux ou trois phrases, reconnais une conduite juste,
-examine avec franchise et mesure un point de vigilance fondé sur les
-faits, puis indique un geste réalisable. Distingue ce qui est établi
-de ce qui reste incertain ; ne transforme pas un soupçon en verdict.
+Une fois l'intention formulée, adresse à l'utilisateur un retour de
+deux ou trois phrases, en ton nom et en t'appuyant sur cet épisode
+précis. Reconnais une conduite juste, puis examine franchement le
+jugement qui a orienté sa réponse : qu'a-t-il tenu pour certain,
+redouté ou choisi de faire ? Distingue les faits de ce qui reste
+incertain. Termine par un geste réalisable, sans promettre qu'il
+produira le résultat souhaité. Écris comme dans une courte lettre
+morale adressée à une personne, plutôt que comme un bilan ou une
+formule d'encouragement.
 
 Si la pensée de Sénèque, d'Épictète ou de Marc Aurèle éclaire vraiment
 l'épisode, intègre-la naturellement au retour plutôt que d'en faire
@@ -146,6 +174,9 @@ Utilise le chemin indiqué par l'utilisateur. À défaut :
 
 N'écrase pas un fichier existant. Ajoute un suffixe numérique au nom
 si nécessaire.
+
+Si plusieurs épisodes ont été examinés à la demande de l'utilisateur,
+répète les sections propres à chacun dans le même fichier.
 
 Utilise cette structure en omettant les sections qui n'ont pas été
 établies :
